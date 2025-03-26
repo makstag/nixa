@@ -1,1 +1,1 @@
-content
+riscv64
