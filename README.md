@@ -1,0 +1,2 @@
+# nixa
+riscv64
