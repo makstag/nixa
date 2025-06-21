@@ -1,6 +1,6 @@
-#include <riscv.h>
+#include <asm.h>
 
-		.section .text.bootstrap, "ax", %progbits
+		.section .text.bootstrap, "ax"
 		.global bootstrap
 
 bootstrap:
@@ -20,6 +20,16 @@ start:
 		.cfi_startproc
 		.cfi_undefined ra
 
+		/* Zero-out BSS */
+		lla a4, bss_start
+		lla a5, bss_end
+bss_zero:
+		sd zero, (a4)
+		add a4, a4, SIZEOF_PTR
+		blt a4, a5, bss_zero
 
+		/* Disable and clear all interrupts */
+		csrw sie, zero
+		csrw sip, zero
 
 		.cfi_endproc

@@ -1,6 +1,7 @@
 OUTPUT_ARCH(riscv)
 ENTRY(bootstrap)
 
+BITNESS = 0x8
 OFFSET = 0x800
 PAGE_SIZE = 0x1000
 STACK_SIZE = 0x2000
@@ -35,8 +36,12 @@ SECTIONS
 
 	.bss:
 	{
+		PROVIDE(bss_start = .)
 		*(COMMON)
 		*(.bss .bss.*)
+		
+		. = ALIGN(BITNESS)
+		PROVIDE(bss_end = .)
 	}
 
 	. = ALIGN(PAGE_SIZE)
