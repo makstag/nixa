@@ -1,0 +1,12 @@
+_*
+*.log
+*.map
+*.elf
+*.bin
+*.out
+
+*.cmd
+*.o
+*.d
+
+tmp
