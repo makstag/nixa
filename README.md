@@ -1,4 +1,4 @@
-riscv64 [kernel sv48](https://docs.kernel.org/6.3/riscv/vm-layout.html)
+[range address sv48](https://docs.kernel.org/6.3/riscv/vm-layout.html)
 
 ```
 ========================================================================================================================
