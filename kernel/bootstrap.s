@@ -1,35 +1,32 @@
-#include <asm.h>
+#include <riscv.h>
 
 		.section .text.bootstrap, "ax"
+		.align 3
 		.global bootstrap
 
 bootstrap:
-		.option push
-		.option norelax
-1:
-		auipc ra, %pcrel_hi(1f)
-		ld ra, %pcrel_lo(1b)(ra)
-		jr ra
-		.align 3
-1:
-		RISCV_PTR start
-		.option pop
-
-start:
-		.option norelax
 		.cfi_startproc
 		.cfi_undefined ra
 
 		/* Zero-out BSS */
-		lla a4, bss_start
-		lla a5, bss_end
-bss_zero:
+		la a4, bss_start
+		la a5, bss_end
+.Lbss_zero:
 		sd zero, (a4)
-		add a4, a4, SIZEOF_PTR
-		blt a4, a5, bss_zero
+		add a4, a4, PTR_SIZE
+		blt a4, a5, .Lbss_zero
 
 		/* Disable and clear all interrupts */
 		csrw sie, zero
 		csrw sip, zero
+
+		
+
+		.option push
+		.option norelax
+		la gp, global_pointer$
+		.option pop
+
+		la sp, stack_top
 
 		.cfi_endproc

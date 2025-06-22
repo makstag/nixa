@@ -1,15 +1,11 @@
+#include <riscv.h>
+
 OUTPUT_ARCH(riscv)
 ENTRY(bootstrap)
 
-BITNESS = 0x8
-OFFSET = 0x800
-PAGE_SIZE = 0x1000
-STACK_SIZE = 0x2000
-KERNEL_START = 0x80200000
-
 SECTIONS
 {
-	. = KERNEL_START
+	. = KERNEL_BASE
 
 	.text:
 	{
@@ -40,7 +36,7 @@ SECTIONS
 		*(COMMON)
 		*(.bss .bss.*)
 		
-		. = ALIGN(BITNESS)
+		. = ALIGN(PTR_SIZE)
 		PROVIDE(bss_end = .)
 	}
 
