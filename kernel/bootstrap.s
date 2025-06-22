@@ -22,11 +22,6 @@ bootstrap:
 
 		
 
-		.option push
-		.option norelax
-		la gp, global_pointer$
-		.option pop
-
 		la sp, stack_top
 
 		.cfi_endproc
