@@ -24,7 +24,6 @@ SECTIONS
 
 	.data:
 	{
-		PROVIDE(global_pointer$ = . + OFFSET)
 		*(.data .data.*)
 	}
 
@@ -32,12 +31,8 @@ SECTIONS
 
 	.bss:
 	{
-		PROVIDE(bss_start = .)
 		*(COMMON)
-		*(.bss .bss.*)
-		
-		. = ALIGN(PTR_SIZE)
-		PROVIDE(bss_end = .)
+		*(.bss .bss.*)		
 	}
 
 	. = ALIGN(PAGE_SIZE)
