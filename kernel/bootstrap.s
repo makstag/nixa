@@ -1,4 +1,4 @@
-#include <riscv.h>
+#include <common.h>
 
 		.section .text.bootstrap, "ax"
 		.align 3

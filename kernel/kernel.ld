@@ -1,7 +1,12 @@
-#include <riscv.h>
+#include <common.h>
 
 OUTPUT_ARCH(riscv)
 ENTRY(bootstrap)
+
+KERNEL_BASE = 0x80200000
+
+STACK_SIZE  = 8192
+REGISTER_SIZE = 8
 
 SECTIONS
 {
@@ -13,30 +18,26 @@ SECTIONS
 		*(.text .text.*)
 	}
 
-	. = ALIGN(PAGE_SIZE)
-
-	.rodata:
+	.rodata: ALIGN(REGISTER_SIZE)
 	{
 		*(.rodata .rodata.*)
 	}
 
-	. = ALIGN(PAGE_SIZE)
-
-	.data:
+	.data: ALIGN(REGISTER_SIZE)
 	{
 		*(.data .data.*)
 	}
 
-	. = ALIGN(PAGE_SIZE)
-
-	.bss:
+	.bss: ALIGN(REGISTER_SIZE)
 	{
 		*(COMMON)
 		*(.bss .bss.*)		
 	}
 
 	. = ALIGN(PAGE_SIZE)
-
 	. += STACK_SIZE
 	PROVIDE(stack_top = .)
+
+	. = ALIGN(PAGE_SIZE)
+	PROVIDE(end = .)
 }
