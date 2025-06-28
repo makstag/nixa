@@ -1,12 +1,12 @@
 #include <common.h>
 
+#define KERNEL_BASE 0x80200000
+
+#define STACK_SIZE  8192
+#define REGISTER_SIZE 8
+
 OUTPUT_ARCH(riscv)
 ENTRY(bootstrap)
-
-KERNEL_BASE = 0x80200000
-
-STACK_SIZE  = 8192
-REGISTER_SIZE = 8
 
 SECTIONS
 {
