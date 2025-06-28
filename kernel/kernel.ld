@@ -1,16 +1,16 @@
 #include <common.h>
 
-#define KERNEL_BASE 0x80200000
+#define LOAD 0x80200000
 
-#define STACK_SIZE  8192
-#define REGISTER_SIZE 8
+#define STACKSZ  8192
+#define REGISTERSZ 8
 
 OUTPUT_ARCH(riscv)
 ENTRY(bootstrap)
 
 SECTIONS
 {
-	. = KERNEL_BASE
+	. = LOAD
 
 	.text:
 	{
@@ -18,26 +18,26 @@ SECTIONS
 		*(.text .text.*)
 	}
 
-	.rodata: ALIGN(REGISTER_SIZE)
+	.rodata: ALIGN(REGISTERSZ)
 	{
 		*(.rodata .rodata.*)
 	}
 
-	.data: ALIGN(REGISTER_SIZE)
+	.data: ALIGN(REGISTERSZ)
 	{
 		*(.data .data.*)
 	}
 
-	.bss: ALIGN(REGISTER_SIZE)
+	.bss: ALIGN(REGISTERSZ)
 	{
 		*(COMMON)
 		*(.bss .bss.*)		
 	}
 
-	. = ALIGN(PAGE_SIZE)
-	. += STACK_SIZE
+	. = ALIGN(PAGESZ)
+	. += STACKSZ
 	PROVIDE(stack_top = .)
 
-	. = ALIGN(PAGE_SIZE)
+	. = ALIGN(PAGESZ)
 	PROVIDE(end = .)
 }
