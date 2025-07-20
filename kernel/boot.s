@@ -81,6 +81,9 @@ boot:
 
 		call main
 		.cfi_endproc
+spin:
+		wfi
+		j spin 
 
 .macro DEFINE_PAGE, name
 
