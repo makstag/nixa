@@ -17,6 +17,7 @@ SECTIONS
 
 	.rodata: ALIGN(PAGE_SIZE)
 	{
+		PROVIDE(DATA = .)
 		*(.rodata .rodata.*)
 	}
 
