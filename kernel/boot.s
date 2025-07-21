@@ -39,7 +39,7 @@ boot:
 		slli \ppn, \ppn, PPN_SHIFT
 		addi \ppn, \ppn, \flags
 
-		sw \ppn, 0(t0)
+		sd \ppn, 0(t0)
 .endm
 
 		csrw sie, zero
