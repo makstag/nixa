@@ -9,20 +9,26 @@ SECTIONS
 {
 	. = KERNEL_BASE
 
-	.text:
+	.pgtable:
 	{
-		KEEP(*(.text.boot))
+		*(.pgtable)
+		PROVIDE(PGTABLE = .)
+	}
+
+	.text: ALIGN(PAGE_SIZE)
+	{
+		KEEP(*(.text.init))
 		*(.text .text.*)
 	}
 
 	.rodata: ALIGN(PAGE_SIZE)
 	{
-		PROVIDE(DATA = .)
 		*(.rodata .rodata.*)
 	}
 
 	.data: ALIGN(PAGE_SIZE)
 	{
+		PROVIDE(DATA = .)
 		*(.data .data.*)
 	}
 
