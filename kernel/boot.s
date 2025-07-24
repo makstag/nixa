@@ -14,11 +14,11 @@
 
 .equ STACK_SIZE, 0x8000
 
-.section .text.boot, "ax"
+.section .init, "ax"
 .align 3
-.global boot
+.global init
 
-boot:
+init:
 		.option norelax
 		.cfi_startproc
 		.cfi_undefined ra
