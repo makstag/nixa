@@ -15,7 +15,7 @@ SECTIONS
 	.init.text: AT(ADDR(.init.text) - OFFSET)
 	{
 		KEEP(*(.init))
-		PROVIDE(einit = ABSOLUTE(.))
+		PROVIDE(einit = .)
 	}
 
 	.text ALIGN(PAGE_SIZE):
