@@ -27,6 +27,8 @@ SECTIONS
 	.rodata ALIGN(PAGE_SIZE):
 	{
 		*(.rodata .rodata.*)
+		. = ALIGN(PAGE_SIZE)
+		PROVIDE(erodata = .)
 	}
 
 	.data ALIGN(PAGE_SIZE):
@@ -43,5 +45,5 @@ SECTIONS
 	}
 
 	. = ALIGN(PAGE_SIZE)
-	PROVIDE(ekernel = .)
+	PROVIDE(end = .)
 }
