@@ -12,7 +12,6 @@
 .equ PTE_WRITE, 1 << 2
 .equ PTE_EXECUTE, 1 << 3
 
-.equ STACK_SIZE, 0x8000
 
 .section .init, "ax"
 .align 3

@@ -6,44 +6,47 @@ ENTRY(init)
 KERNEL_BASE = 0x80200000
 INIT_BASE = 0x100000
 HALF_PAGE = 0x800
+STACK_SIZE = 0x200000
 
 SECTIONS
 {
-	. = KERNEL_BASE
-	HIDDEN(OFFSET = KERNEL_BASE - INIT_BASE)
+	. = INIT_BASE
 
-	.init.text: AT(ADDR(.init.text) - OFFSET)
+	.init.text:
 	{
 		KEEP(*(.init))
 		. = ALIGN(PAGE_SIZE)
 		PROVIDE(einit = .)
 	}
+	
+	. = KERNEL_BASE
 
-	.text ALIGN(PAGE_SIZE):
+	.text:
 	{
 		*(.text .text.*)
 	}
 
-	.rodata ALIGN(PAGE_SIZE):
+	.rodata ALIGN(SIZEOF_PTR):
 	{
 		*(.rodata .rodata.*)
 		. = ALIGN(PAGE_SIZE)
 		PROVIDE(erodata = .)
 	}
 
-	.data ALIGN(PAGE_SIZE):
+	.data ALIGN(SIZEOF_PTR):
 	{
 		PROVIDE(data = .)
-		PROVIDE(global_pointer$ = . + HALF_PAGE)
+		PROVIDE(global_ptr$ = . + HALF_PAGE)
 		*(.data .data.*)
 	}
 
-	.bss ALIGN(PAGE_SIZE):
+	.bss ALIGN(SIZEOF_PTR):
 	{
 		*(COMMON)
 		*(.bss .bss.*)		
 	}
 
 	. = ALIGN(PAGE_SIZE)
-	PROVIDE(end = .)
+	. += STACK_SIZE
+	PROVIDE(stack_ptr = .)
 }
