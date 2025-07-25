@@ -33,10 +33,11 @@ SECTIONS
 		PROVIDE(erodata = .)
 	}
 
-	.data ALIGN(SIZEOF_PTR):
+	.data:
 	{
 		PROVIDE(data = .)
 		PROVIDE(global_ptr$ = . + HALF_PAGE)
+		. = ALIGN(SIZEOF_PTR)
 		*(.data .data.*)
 	}
 
