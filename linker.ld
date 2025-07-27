@@ -10,16 +10,14 @@ STACK_SIZE = 0x200000
 
 SECTIONS
 {
-	. = INIT_BASE
+	. = KERNEL_BASE
+	HIDDEN(OFFSET = KERNEL_BASE - INIT_BASE)
 
-	.init.text:
+	.init.text: AT(ADDR(.init.text) - OFFSET)
 	{
 		KEEP(*(.init))
-		. = ALIGN(PAGE_SIZE)
-		PROVIDE(einit = .)
+		einit = ABSOLUTE(.)
 	}
-	
-	. = KERNEL_BASE
 
 	.text:
 	{
@@ -30,24 +28,27 @@ SECTIONS
 	{
 		*(.rodata .rodata.*)
 		. = ALIGN(PAGE_SIZE)
-		PROVIDE(erodata = .)
+		erodata = .
 	}
 
 	.data:
 	{
-		PROVIDE(data = .)
-		PROVIDE(global_ptr$ = . + HALF_PAGE)
+		data = .
+		global_ptr$ = . + HALF_PAGE
 		. = ALIGN(SIZEOF_PTR)
 		*(.data .data.*)
 	}
 
 	.bss ALIGN(SIZEOF_PTR):
 	{
+		bss = .
 		*(COMMON)
-		*(.bss .bss.*)		
+		*(.bss .bss.*)
+		. = ALIGN(SIZEOF_PTR)
+		ebss = .
 	}
 
 	. = ALIGN(PAGE_SIZE)
 	. += STACK_SIZE
-	PROVIDE(stack_ptr = .)
+	stack_ptr = .
 }
