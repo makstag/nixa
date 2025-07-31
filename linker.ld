@@ -31,11 +31,10 @@ SECTIONS
 		erodata = .
 	}
 
-	.data:
+	.data ALIGN(SIZEOF_PTR):
 	{
 		data = .
 		global_ptr$ = . + HALF_PAGE
-		. = ALIGN(SIZEOF_PTR)
 		*(.data .data.*)
 	}
 
