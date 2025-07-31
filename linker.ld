@@ -22,18 +22,17 @@ SECTIONS
 	.text:
 	{
 		*(.text .text.*)
+		. = ALIGN(PAGE_SIZE)
+		etext = .
 	}
 
 	.rodata ALIGN(SIZEOF_PTR):
 	{
 		*(.rodata .rodata.*)
-		. = ALIGN(PAGE_SIZE)
-		erodata = .
 	}
 
 	.data ALIGN(SIZEOF_PTR):
 	{
-		data = .
 		global_ptr$ = . + HALF_PAGE
 		*(.data .data.*)
 	}
