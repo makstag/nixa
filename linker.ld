@@ -48,5 +48,5 @@ SECTIONS
 
 	. = ALIGN(PAGE_SIZE)
 	. += STACK_SIZE
-	stack_ptr = .
+	PROVIDE(stack_ptr = .)
 }
