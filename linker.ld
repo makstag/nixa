@@ -23,7 +23,7 @@ SECTIONS
 	{
 		*(.text .text.*)
 		. = ALIGN(PAGE_SIZE)
-		etext = .
+		PROVIDE(etext = .)
 	}
 
 	.rodata ALIGN(SIZEOF_PTR):
