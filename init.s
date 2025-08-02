@@ -12,16 +12,6 @@
 .equ PTE_WRITE, 1 << 2
 .equ PTE_EXECUTE, 1 << 3
 
-
-.section .init, "ax"
-.align 3
-.global init
-
-init:
-		.option norelax
-		.cfi_startproc
-		.cfi_undefined ra
-
 .macro PPN, reg, pt
 		la \reg, \pt
 		srli \reg, \reg, PAGE_SHIFT
@@ -40,6 +30,24 @@ init:
 
 		sd \ppn, 0(t0)
 .endm
+
+.macro DEFINE_PAGE, name
+.balign PAGE_SIZE
+\name:
+		.rep PAGE_SIZE
+		.byte 0
+		.endr
+.endm
+
+
+.section .init, "ax"
+.balign SIZEOF_PTR
+.global init
+
+init:
+		.option norelax
+		.cfi_startproc
+		.cfi_undefined ra
 
 		csrw sie, zero
 		csrw sip, zero 
@@ -82,16 +90,6 @@ init:
 		.cfi_endproc
 spin:
 		wfi
-		j spin 
-
-.macro DEFINE_PAGE, name
-
-.align PAGE_SHIFT
-\name:
-.rep PAGE_SIZE
-		.byte 0
-.endr
-
-.endm
+		j spin
 
 DEFINE_PAGE SATP_TABLE 
