@@ -49,9 +49,6 @@ init:
 		.cfi_startproc
 		.cfi_undefined ra
 
-		csrw sie, zero
-		csrw sip, zero 
-
 		PPN t2, L2_CODE 
 		PTE_SET L3_KERNEL, KERNEL_BASE, 3, t2, PTE_VALID 
 

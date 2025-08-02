@@ -35,10 +35,8 @@ SECTIONS
 
 	.bss ALIGN(SIZEOF_PTR): AT(ADDR(.bss) - OFFSET)
 	{
-		bss = . - OFFSET
 		*(COMMON)
 		*(.bss .bss.*)
-		ebss = . - OFFSET
 	}
 
 	. = ALIGN(PAGE_SIZE)
