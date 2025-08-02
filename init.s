@@ -40,7 +40,7 @@
 .endm
 
 
-.section .init, "ax"
+.section .text.init, "ax"
 .balign SIZEOF_PTR
 .global init
 
