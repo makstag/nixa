@@ -12,90 +12,66 @@
 .equ PTE_WRITE, 1 << 2
 .equ PTE_EXECUTE, 1 << 3
 
-.macro GLOBAL_POINTER
-		.option push
-		.option norelax
-
-		la gp, global_ptr$
-
-		.option pop
-.endm
-
-.macro DEFINE_PAGE, name
-.balign PAGE_SIZE
-
-\name:
-		.rep PAGE_SIZE
-		.byte 0
-		.endr
-.endm
-
-.macro PPN, reg, pt
-		la \reg, \pt
-		srli \reg, \reg, PAGE_SHIFT
-.endm
-
-.macro PTE_SET, pt, va, lvl, ppn, flags
-		la t1, \va
-		srli t1, t1, (PAGE_SHIFT + SATP_BITS * \lvl)
-		andi t1, t1, SATP_MASK
-
-		la t0, \pt
-		add t0, t0, t1
-
-		slli \ppn, \ppn, PPN_SHIFT
-		addi \ppn, \ppn, \flags
-
-		sd \ppn, 0(t0)
-.endm
+.equ .FILL, 0
 
 
 .section .text.init, "ax"
 .balign SIZEOF_PTR
 .global init
 
-init:
-		.cfi_startproc
-		.cfi_undefined ra
+.macro GLOBAL_POINTER
+		.option push
+		.option norelax
+		la gp, global_ptr$
+		.option pop
+.endm
 
-		GLOBAL_POINTER 
+.macro PPN, reg, physaddr
+		la \reg, \physaddr
+		srli \reg, \reg, PAGE_SHIFT
+.endm
+
+.macro PTE_SET, table, virtaddr, lvl, physaddr, flags
+		la t1, \virtaddr
+		srli t1, t1, (PAGE_SHIFT + SATP_BITS * \lvl)
+		andi t1, t1, SATP_MASK
+
+		la t0, \table
+		add t0, t0, t1
+
+		slli \physaddr, \physaddr, PPN_SHIFT
+		addi \physaddr, \physaddr, \flags
+
+		sw \physaddr, .FILL(t0)
+.endm
+
+.macro MAP_PAGES, table, virtaddr, size, physaddr, flags
+		
+.endm
+
+
+init:
+		PPN a2, INIT_BASE
+		MAP_PAGES STRUCT_SATP, KERNEL_BASE, data - KERNEL_BASE, a2, PTE_VALID | PTE_EXECUTE | PTE_READ
+
+		PPN a2, pdata
+		MAP_PAGES STRUCT_SATP, data, stack_ptr - data, a2, PTE_VALID | PTE_READ | PTE_WRITE
+
+		GLOBAL_POINTER
 		la sp, stack_ptr
 
-		PPN t2, L2_CODE 
-		PTE_SET L3_KERNEL, KERNEL_BASE, 3, t2, PTE_VALID 
-
-		PPN t2, KERNEL_BASE 
-		PTE_SET L2_CODE, KERNEL_BASE, 2, t2, PTE_VALID | PTE_EXECUTE | PTE_READ | PTE_WRITE 
-
-		PPN t2, L2_DATA 
-		PTE_SET L3_KERNEL, DATA, 3, t2, PTE_VALID 
-
-		PPN t2, DATA 
-		PTE_SET L2_DATA, DATA, 2, t2, PTE_VALID | PTE_READ | PTE_WRITE 
-
-		la a3, END  
-		addi a3, a3, STACK_SIZE
-		li a2, PAGE_SIZE 
-		cssr a4, mhartid
-		addi a4, a4, 1
-		mul a2, a2, a4
-		add a3, a3, a2
-
-		PPN t2, L1_STACK 
-		PTE_SET L2_DATA, a3, 2, t2, PTE_VALID 
-
-		PPN t2, a3
-		PTE_SET L1_STACK, a3, 1, t2, PTE_VALID | PTE_READ | PTE_WRITE 
-
-		li t1, SATP_BITS 
-		slli t1, t1, SATP_SHIFT 
-		PPN t0, L3_KERNEL 
-		or t0, t0, t1
-		csrw satp, t0
-
-		la sp, a3
-
 		call main
-		.cfi_endproc
 
-DEFINE_PAGE SATP_TABLE 
+
+.macro DEFINE_PAGE, name
+.balign PAGE_SIZE
+\name:
+		.rep PAGE_SIZE
+		.byte .FILL
+		.endr
+.endm
+
+.section .bss
+.global STRUCT_SATP
+
+DEFINE_PAGE STRUCT_SATP

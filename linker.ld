@@ -24,6 +24,7 @@ SECTIONS
 	.rodata ALIGN(PAGE_SIZE): AT(ADDR(.rodata) - OFFSET)
 	{
 		PROVIDE(data = .)
+		PROVIDE(pdata = . - OFFSET)
 		*(.rodata .rodata.*)
 	}
 
