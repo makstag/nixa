@@ -3,6 +3,9 @@
 .equ PAGE_SHIFT, 12
 .equ PPN_SHIFT, 10
 
+.equ L3, 3
+.equ DECRIMENT, -1
+
 .equ SATP_BITS, 9
 .equ SATP_SHIFT, 60
 .equ SATP_MASK, 0x1FF
@@ -13,9 +16,6 @@
 .equ PTE_EXECUTE, 1 << 3
 
 .equ .PLACE_HOLDER, 0
-.equ .L3, 3
-.equ .DECRIMENT, -1
-
 
 .section .text.init, "ax"
 .balign SIZEOF_PTR
@@ -80,12 +80,12 @@ init:
 		call main
 
 walk:
-		li t1, .L3
+		li t1, L3
 for:
 		li t2, .PLACE_HOLDER
 		bltu t2, t1, fbreak
 
-		addi t1, t1, .DECRIMENT
+		addi t1, t1, DECRIMENT
 		j for
 fbreak:
 
