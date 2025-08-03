@@ -19,7 +19,7 @@
 .balign SIZEOF_PTR
 .global init
 
-.macro GLOBAL_POINTER
+.macro SET_GLOBAL_POINTER
 		.option push
 		.option norelax
 		la gp, global_ptr$
@@ -63,7 +63,7 @@ init:
 		or t0, t0, t1
 		csrw satp, t0
   
-		GLOBAL_POINTER
+		SET_GLOBAL_POINTER
 		la sp, stack_ptr
 
 		call main
