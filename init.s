@@ -64,6 +64,7 @@ init:
 
 
 .macro DEFINE_PAGE, name
+.section .bss
 .balign PAGE_SIZE
 \name:
 		.rep PAGE_SIZE
@@ -71,7 +72,5 @@ init:
 		.endr
 .endm
 
-.section .bss
 .global STRUCT_SATP
-
 DEFINE_PAGE STRUCT_SATP
