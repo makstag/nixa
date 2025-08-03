@@ -12,7 +12,9 @@
 .equ PTE_WRITE, 1 << 2
 .equ PTE_EXECUTE, 1 << 3
 
-.equ .FILL, 0
+.equ .PLACE_HOLDER, 0
+.equ .L3, 3
+.equ .DECRIMENT, -1
 
 
 .section .text.init, "ax"
@@ -42,20 +44,29 @@
 		slli \physaddr, \physaddr, PPN_SHIFT
 		addi \physaddr, \physaddr, \flags
 
-		sw \physaddr, .FILL(t0)
+		sw \physaddr, .PLACE_HOLDER(t0)
 .endm
 
-.macro MAP_PAGES, table, virtaddr, size, physaddr, flags
-		
+.macro MAP_PAGES, virtaddr, size, physaddr, flags
+		la a3, \virtaddr
+		addi t0, a3, \size
+while:
+		bne a3, t0, wbreak
+		jal walk
+
+		addi a3, a3, PAGE_SIZE
+		addi a2, a2, PAGE_SIZE
+		j while
+wbreak:
 .endm
 
 
 init:
-		PPN a2, INIT_BASE
-		MAP_PAGES STRUCT_SATP, KERNEL_BASE, data - KERNEL_BASE, a2, PTE_VALID | PTE_EXECUTE | PTE_READ
+		PPN a2, PKERNEL_BASE
+		MAP_PAGES VKERNEL_BASE, vdata - VKERNEL_BASE - PAGE_SIZE, a2, PTE_VALID | PTE_EXECUTE | PTE_READ
 
 		PPN a2, pdata
-		MAP_PAGES STRUCT_SATP, data, stack_ptr - data, a2, PTE_VALID | PTE_READ | PTE_WRITE
+		MAP_PAGES vdata, stack_ptr - vdata - PAGE_SIZE, a2, PTE_VALID | PTE_READ | PTE_WRITE
 
 		li t1, SATP_BITS 
 		slli t1, t1, SATP_SHIFT 
@@ -68,13 +79,24 @@ init:
 
 		call main
 
+walk:
+		li t1, .L3
+for:
+		li t2, .PLACE_HOLDER
+		bltu t2, t1, fbreak
+
+		addi t1, t1, .DECRIMENT
+		j for
+fbreak:
+
+		ret
 
 .macro DEFINE_PAGE, name
 .section .bss
 .balign PAGE_SIZE
 \name:
 		.rep PAGE_SIZE
-		.byte .FILL
+		.byte .PLACE_HOLDER
 		.endr
 .endm
 
