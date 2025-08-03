@@ -21,6 +21,8 @@
 .balign SIZEOF_PTR
 .global init
 
+
+init:
 .macro SET_GLOBAL_POINTER
 		.option push
 		.option norelax
@@ -60,8 +62,6 @@ while:
 wbreak:
 .endm
 
-
-init:
 		PPN a2, PKERNEL_BASE
 		MAP_PAGES VKERNEL_BASE, vdata - VKERNEL_BASE - PAGE_SIZE, a2, PTE_VALID | PTE_EXECUTE | PTE_READ
 
