@@ -12,6 +12,24 @@
 .equ PTE_WRITE, 1 << 2
 .equ PTE_EXECUTE, 1 << 3
 
+.macro GLOBAL_POINTER
+		.option push
+		.option norelax
+
+		la gp, global_ptr$
+
+		.option pop
+.endm
+
+.macro DEFINE_PAGE, name
+.balign PAGE_SIZE
+
+\name:
+		.rep PAGE_SIZE
+		.byte 0
+		.endr
+.endm
+
 .macro PPN, reg, pt
 		la \reg, \pt
 		srli \reg, \reg, PAGE_SHIFT
@@ -31,23 +49,17 @@
 		sd \ppn, 0(t0)
 .endm
 
-.macro DEFINE_PAGE, name
-.balign PAGE_SIZE
-\name:
-		.rep PAGE_SIZE
-		.byte 0
-		.endr
-.endm
-
 
 .section .text.init, "ax"
 .balign SIZEOF_PTR
 .global init
 
 init:
-		.option norelax
 		.cfi_startproc
 		.cfi_undefined ra
+
+		GLOBAL_POINTER 
+		la sp, stack_ptr
 
 		PPN t2, L2_CODE 
 		PTE_SET L3_KERNEL, KERNEL_BASE, 3, t2, PTE_VALID 
@@ -85,8 +97,5 @@ init:
 
 		call main
 		.cfi_endproc
-spin:
-		wfi
-		j spin
 
 DEFINE_PAGE SATP_TABLE 
