@@ -1,9 +1,10 @@
 #include <common.h>
 
+
 .equ PAGE_SHIFT, 12
 .equ PPN_SHIFT, 10
 
-.equ L3, 3
+.equ LEVELS, 3
 .equ DECRIMENT, -1
 
 .equ SATP_BITS, 9
@@ -17,12 +18,11 @@
 
 .equ .PLACE_HOLDER, 0
 
+
 .section .text.init, "ax"
 .balign SIZEOF_PTR
 .global init
 
-
-init:
 .macro SET_GLOBAL_POINTER
 		.option push
 		.option norelax
@@ -62,6 +62,8 @@ while:
 wbreak:
 .endm
 
+
+init:
 		PPN a2, PKERNEL_BASE
 		MAP_PAGES VKERNEL_BASE, vdata - VKERNEL_BASE - PAGE_SIZE, a2, PTE_VALID | PTE_EXECUTE | PTE_READ
 
@@ -80,7 +82,7 @@ wbreak:
 		call main
 
 walk:
-		li t1, L3
+		li t1, LEVELS
 for:
 		li t2, .PLACE_HOLDER
 		bltu t2, t1, fbreak
