@@ -57,6 +57,12 @@ init:
 		PPN a2, pdata
 		MAP_PAGES STRUCT_SATP, data, stack_ptr - data, a2, PTE_VALID | PTE_READ | PTE_WRITE
 
+		li t1, SATP_BITS 
+		slli t1, t1, SATP_SHIFT 
+		PPN t0, STRUCT_SATP
+		or t0, t0, t1
+		csrw satp, t0
+  
 		GLOBAL_POINTER
 		la sp, stack_ptr
 
