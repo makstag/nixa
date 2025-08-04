@@ -33,20 +33,24 @@
 .macro PPN, dst, physaddr
 		la \dst, \physaddr
 		srli \dst, \dst, PAGE_SHIFT
+		slli \dst, \dst, PPN_SHIFT
 .endm
 
-.macro PTE_SET, table, virtaddr, lvl, physaddr, flags
-		la t1, \virtaddr
-		srli t1, t1, (PAGE_SHIFT + SATP_BITS * \lvl)
-		andi t1, t1, SATP_MASK
+.macro PA, dst
+		srli \dst, \dst, PPN_SHIFT
+		slli \dst, \dst, PAGE_SHIFT
+.endm
 
-		la t0, \table
-		add t0, t0, t1
+.macro PTE_GET, virtaddr, level
+		mv t2, \virtaddr
+		li t3, SATP_BITS
+		mul t3, t3, \level
+		addi t3, t3, PAGE_SHIFT
+		srl t2, t2, t3
+		andi t2, t2, SATP_MASK
 
-		slli \physaddr, \physaddr, PPN_SHIFT
-		addi \physaddr, \physaddr, \flags
-
-		sw \physaddr, .PLACE_HOLDER(t0)
+		add t4, t4, t2
+		lw s1, .PLACE_HOLDER(t4)
 .endm
 
 .macro MAP_PAGES, virtaddr, size, flags
@@ -75,24 +79,43 @@ init:
 
 		call main
 
-while:
-		bne a3, t0, wbreak
-		jal walk
+walk:
+		bne a3, a4, break
+		li t0, LEVELS
+		la t4, STRUCT_SATP
+
+1:
+		li t1, .PLACE_HOLDER
+		bltu t1, t0, 1f
+
+		PTE_GET a3, t0
+		andi t1, s1, PTE_VALID
+		beqz t1, else
+
+		PA s1
+		mv t4, s1
+		j continue
+
+else:
+		DEFINE_PAGE table
+		PPN t4, table
+		addi s2, t4, PTE_VALID
+		sw s2, .PLACE_HOLDER(s1)
+
+continue:
+		addi t0, t0, DECRIMENT
+		j 1b
+
+1:
+		PTE_GET a3, t1
+		add s2, a2, a5
+		sw s2, .PLACE_HOLDER(s1)
 
 		addi a3, a3, PAGE_SIZE
 		addi a2, a2, PAGE_SIZE
-		j while
-wbreak:
-walk:
-		li t1, LEVELS
-for:
-		li t2, .PLACE_HOLDER
-		bltu t2, t1, fbreak
+		j walk
 
-		addi t1, t1, DECRIMENT
-		j for
-fbreak:
-
+break:
 		ret
 
 .macro DEFINE_PAGE, name
