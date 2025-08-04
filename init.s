@@ -49,26 +49,20 @@
 		sw \physaddr, .PLACE_HOLDER(t0)
 .endm
 
-.macro MAP_PAGES, virtaddr, size, physaddr, flags
+.macro MAP_PAGES, virtaddr, size, flags
 		la a3, \virtaddr
-		addi t0, a3, \size
-while:
-		bne a3, t0, wbreak
+		addi a4, a3, \size
+  		li a5, \flags
 		jal walk
-
-		addi a3, a3, PAGE_SIZE
-		addi a2, a2, PAGE_SIZE
-		j while
-wbreak:
 .endm
 
 
 init:
 		PPN a2, PKERNEL_BASE
-		MAP_PAGES VKERNEL_BASE, vdata - VKERNEL_BASE - PAGE_SIZE, a2, PTE_VALID | PTE_EXECUTE | PTE_READ
+		MAP_PAGES VKERNEL_BASE, vdata - VKERNEL_BASE - PAGE_SIZE, PTE_VALID | PTE_EXECUTE | PTE_READ
 
 		PPN a2, pdata
-		MAP_PAGES vdata, stack_ptr - vdata - PAGE_SIZE, a2, PTE_VALID | PTE_READ | PTE_WRITE
+		MAP_PAGES vdata, stack_ptr - vdata - PAGE_SIZE, PTE_VALID | PTE_READ | PTE_WRITE
 
 		li t1, SATP_BITS 
 		slli t1, t1, SATP_SHIFT 
@@ -81,6 +75,14 @@ init:
 
 		call main
 
+while:
+		bne a3, t0, wbreak
+		jal walk
+
+		addi a3, a3, PAGE_SIZE
+		addi a2, a2, PAGE_SIZE
+		j while
+wbreak:
 walk:
 		li t1, LEVELS
 for:
@@ -102,5 +104,4 @@ fbreak:
 		.endr
 .endm
 
-.global STRUCT_SATP
 DEFINE_PAGE STRUCT_SATP
