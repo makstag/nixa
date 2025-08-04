@@ -23,16 +23,16 @@
 .balign SIZEOF_PTR
 .global init
 
-.macro SET_GLOBAL_POINTER
+.macro LOAD_GLOBAL_POINTER
 		.option push
 		.option norelax
 		la gp, global_ptr$
 		.option pop
 .endm
 
-.macro PPN, reg, physaddr
-		la \reg, \physaddr
-		srli \reg, \reg, PAGE_SHIFT
+.macro PPN, dst, physaddr
+		la \dst, \physaddr
+		srli \dst, \dst, PAGE_SHIFT
 .endm
 
 .macro PTE_SET, table, virtaddr, lvl, physaddr, flags
@@ -70,7 +70,7 @@ init:
 		or t0, t0, t1
 		csrw satp, t0
   
-		SET_GLOBAL_POINTER
+		LOAD_GLOBAL_POINTER
 		la sp, stack_ptr
 
 		call main
