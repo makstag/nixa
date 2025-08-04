@@ -70,9 +70,9 @@ init:
 
 		li t1, SATP_BITS 
 		slli t1, t1, SATP_SHIFT 
-		PPN t0, STRUCT_SATP
-		or t0, t0, t1
-		csrw satp, t0
+		PPN t4, STRUCT_SATP
+		or t4, t4, t1
+		csrw satp, t4
   
 		LOAD_GLOBAL_POINTER
 		la sp, stack_ptr
