@@ -36,7 +36,7 @@
 		slli \dst, \dst, PPN_SHIFT
 .endm
 
-.macro PA, dst
+.macro PHYSADDR, dst
 		srli \dst, \dst, PPN_SHIFT
 		slli \dst, \dst, PAGE_SHIFT
 .endm
@@ -92,7 +92,7 @@ walk:
 		andi t1, s1, PTE_VALID
 		beqz t1, else
 
-		PA s1
+		PHYSADDR s1
 		mv t4, s1
 		j continue
 
