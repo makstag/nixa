@@ -97,9 +97,9 @@ walk:
 		j continue
 
 else:
-		DEFINE_PAGE table
-  		la t4, table
-		PPN s2, table
+		DEFINE_PAGE TABLE
+  		la t4, TABLE
+		PPN s2, TABLE
 		addi s2, s2, PTE_VALID
 		sw s2, .PLACE_HOLDER(s1)
 
