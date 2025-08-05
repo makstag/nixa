@@ -80,23 +80,28 @@ init:
 		call main
 
 walk:
+		/* Find the PTE for virtual address */
 		bne a3, a4, break
 		li t0, LEVELS
 		la t4, STRUCT_SATP
 
 1:
-		li t1, .PLACE_HOLDER
+  		/* Walk through page table levels */
+  		li t1, .PLACE_HOLDER
 		bltu t1, t0, 1f
 
+		/* Get PTE for this level */
 		PTE_GET a3, t0
 		andi t1, s1, PTE_VALID
 		beqz t1, else
 
+		/* If PTE is valid, get next level page table */
 		PHYSADDR s1
 		mv t4, s1
 		j continue
 
 else:
+		/* Initialize new page table page */
 		DEFINE_PAGE TABLE
   		la t4, TABLE
 
@@ -109,7 +114,10 @@ continue:
 		j 1b
 
 1:
+		/* Final level PTE */
 		PTE_GET a3, t1
+
+    		/* Create the mapping */
 		add s2, a2, a5
 		sw s2, .PLACE_HOLDER(s1)
 
