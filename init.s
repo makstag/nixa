@@ -107,6 +107,7 @@ else:
 
 		PPN s2, TABLE
 		addi s2, s2, PTE_VALID
+  
 		sw s2, .PLACE_HOLDER(s1)
 
 continue:
@@ -116,9 +117,9 @@ continue:
 1:
 		/* Final level PTE */
 		PTE_GET a3, t1
-
-    		/* Create the mapping */
 		add s2, a2, a5
+
+  		/* Create the mapping */
 		sw s2, .PLACE_HOLDER(s1)
 
 		addi a3, a3, PAGE_SIZE
