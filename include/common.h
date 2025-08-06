@@ -1,11 +1,14 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
-typedef unsigned int uint32_t;
-typedef unsigned long uint64_t;
-typedef uint64_t size_t;
+typedef unsigned char uint8;
+typedef unsigned short uint16;
+typedef unsigned int uint32;
+typedef unsigned long uint64;
+typedef char int8;
+typedef short int16;
+typedef int int32;
+typedef long int64;
 
 #define PAGE_SIZE 4096
 #define SIZEOF_PTR 8
@@ -15,4 +18,5 @@ typedef uint64_t size_t;
 
 #define NULL ((void*)0)
 
+void* memset(void* s, int c, uint64 count);
 #endif /* COMMON_H */
