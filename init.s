@@ -1,4 +1,4 @@
-#include <common.h>
+#include <param.h>
 
 
 .equ PAGE_SHIFT, 12

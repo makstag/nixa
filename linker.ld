@@ -1,4 +1,4 @@
-#include <common.h>
+#include <param.h>
 
 OUTPUT_ARCH(riscv)
 ENTRY(init)
