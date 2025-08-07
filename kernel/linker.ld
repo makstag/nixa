@@ -1,5 +1,6 @@
 #include <param.h>
 
+
 OUTPUT_ARCH(riscv)
 ENTRY(init)
 
@@ -10,6 +11,7 @@ OFFSET = VKERNEL_BASE - PKERNEL_BASE
 
 HALF_PAGE = 0x800
 STACK_SIZE = 0x200000
+
 
 SECTIONS
 {
@@ -42,4 +44,8 @@ SECTIONS
 
 	. = ALIGN(PAGE_SIZE)
 	PROVIDE(stack_ptr = . + STACK_SIZE)
+	
+	. = ALIGN(PAGE_SIZE)
+	PROVIDE(vend = .)
+	PROVIDE(pend = . - OFFSET)
 }

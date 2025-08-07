@@ -50,7 +50,7 @@
 		andi t2, t2, SATP_MASK
 
 		add t4, t4, t2
-		lw s1, .PLACE_HOLDER(t4)
+		ld s1, .PLACE_HOLDER(t4)
 .endm
 
 .macro MAP_PAGES, virtaddr, size, flags
@@ -62,17 +62,18 @@
 
 
 init:
+                jal alloc_page
+                li t1, SATP_BITS 
+		slli t1, t1, SATP_SHIFT 
+		mv t4, s0
+		or t4, t4, t1
+		csrw satp, t4
+
 		PPN a2, PKERNEL_BASE
 		MAP_PAGES VKERNEL_BASE, vdata - VKERNEL_BASE - PAGE_SIZE, PTE_VALID | PTE_EXECUTE | PTE_READ
 
 		PPN a2, pdata
-		MAP_PAGES vdata, stack_ptr - vdata - PAGE_SIZE, PTE_VALID | PTE_READ | PTE_WRITE
-
-		li t1, SATP_BITS 
-		slli t1, t1, SATP_SHIFT 
-		PPN t4, STRUCT_SATP
-		or t4, t4, t1
-		csrw satp, t4
+		MAP_PAGES vdata, vend - vdata - PAGE_SIZE, PTE_VALID | PTE_READ | PTE_WRITE
   
 		LOAD_GLOBAL_POINTER
 		la sp, stack_ptr
@@ -83,7 +84,7 @@ walk:
 		/* Find the PTE for virtual address */
 		bne a3, a4, break
 		li t0, LEVELS
-		la t4, STRUCT_SATP
+		mv t4, a0
 
 1:
   		/* Walk through page table levels */
@@ -102,13 +103,14 @@ walk:
 
 else:
 		/* Initialize new page table page */
-		DEFINE_PAGE TABLE
-  		la t4, TABLE
+		jal alloc_page
+  		mv t4, s0
 
-		PPN s2, TABLE
-		addi s2, s2, PTE_VALID
+		srli s0, s0, PAGE_SHIFT
+		slli s0, s0, PPN_SHIFT
+		addi s0, s0, PTE_VALID
   
-		sw s2, .PLACE_HOLDER(s1)
+		sd s0, .PLACE_HOLDER(s1)
 
 continue:
 		addi t0, t0, DECRIMENT
@@ -120,7 +122,7 @@ continue:
 		add s2, a2, a5
 
   		/* Create the mapping */
-		sw s2, .PLACE_HOLDER(s1)
+		sd s2, .PLACE_HOLDER(s1)
 
 		addi a3, a3, PAGE_SIZE
 		addi a2, a2, PAGE_SIZE
@@ -128,6 +130,18 @@ continue:
 
 break:
 		ret
+
+alloc_page:
+.Lpcrel_hi0:
+		auipc   a1, %pcrel_hi(next_paddr)
+		ld      a0, %pcrel_lo(.Lpcrel_hi0)(a1)
+		lui     s0, 4
+		add     s0, s0, a0
+		sd      s0, %pcrel_lo(.Lpcrel_hi0)(a1)
+		ret
+
+next_paddr:
+		.quad   pend
 
 
 .macro DEFINE_PAGE, name
@@ -138,5 +152,3 @@ break:
 		.byte .PLACE_HOLDER
 		.endr
 .endm
-
-DEFINE_PAGE STRUCT_SATP
