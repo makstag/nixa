@@ -62,10 +62,10 @@
 
 
 init:
-                jal alloc_page
-                li t1, SATP_BITS 
+        jal alloc_page
+        li t1, SATP_BITS 
 		slli t1, t1, SATP_SHIFT 
-		mv t4, s0
+		mv t4, a0
 		or t4, t4, t1
 		csrw satp, t4
 
@@ -104,13 +104,13 @@ walk:
 else:
 		/* Initialize new page table page */
 		jal alloc_page
-  		mv t4, s0
+  		mv t4, a0
 
-		srli s0, s0, PAGE_SHIFT
-		slli s0, s0, PPN_SHIFT
-		addi s0, s0, PTE_VALID
+		srli a0, a0, PAGE_SHIFT
+		slli a0, a0, PPN_SHIFT
+		addi a0, a0, PTE_VALID
   
-		sd s0, .PLACE_HOLDER(s1)
+		sd a0, .PLACE_HOLDER(s1)
 
 continue:
 		addi t0, t0, DECRIMENT
